@@ -1,4 +1,4 @@
-// Values
+// Dictionaries and Constants
 
 const difficultyGridSettings = {
   easy: { gridSize: 6, modifier: 0.05 },
@@ -20,7 +20,7 @@ const relative_coordinates_to_check = [
   ["SE", 1, 1],
 ];
 
-// GET START ELEMENTS
+// Get start elements from layout
 
 let allGridButtons;
 let gameSpace = document.getElementById("game-space");
@@ -33,8 +33,9 @@ let size = difficultyGridSettings[difficulty]["gridSize"];
 let modifier = difficultyGridSettings[difficulty]["modifier"];
 let modifierTotal = 0;
 
-// FUNCTIONS
+// ---------------------- FUNCTIONS ----------------------
 
+// Updates changes to settings in settings variables. Should trigger whenever a setting is changed.
 const updateSettings = function () {
   difficultySettings = document.getElementsByName("dificulty");
   difficulty = [...difficultySettings].filter(
@@ -42,10 +43,12 @@ const updateSettings = function () {
   )[0].value;
   size = difficultyGridSettings[difficulty]["gridSize"];
   modifier = difficultyGridSettings[difficulty]["modifier"];
+  gameValuesTable = [];
+  visibilityTable = [];
 };
 
-// Generates the visable game table and values table
-
+// Generates the visable game table and the seperate values table, and visibility table.
+// Game table is html table made of buttons. Values table is array holding mine counts for each "cell", visibity table is array showing if cell has been "revealed" by player.
 const generateGameTable = function () {
   updateSettings();
   gameValuesTable = [];
@@ -67,12 +70,11 @@ const generateGameTable = function () {
   generateGameMines();
   generateMineCounts();
   console.log(gameValuesTable);
-  console.log(visibilityTable)
+  console.log(visibilityTable);
   allGridButtons = Array.from(document.getElementsByClassName("game-button"));
 };
 
-// Generate Mines
-
+// Generate Mines. Once game and value table is created. Populates value table with mines, based on random number and difficulty modifier.
 const generateMines = function () {
   let calc = Math.floor((Math.random() + modifierTotal) * 10);
   if (calc >= 9.8) {
@@ -91,30 +93,36 @@ const generateGameMines = function () {
   }
 };
 
-const calculateNumber = function (x, y) {
+// Check if a row and col combinations is valid, and within the given table.
+const validCell = function (check_row, check_col) {
+  return (
+    check_row >= 0 && check_col >= 0 && check_row < size && check_col < size
+  );
+};
+
+// Count Mines for each cell. After the value table has been populated with mines. For each other cell, count how many mines are next to it.
+const calculateNumber = function (row, col) {
   let check_row;
   let check_col;
   let count_of_mines_nearby = 0;
 
   if (gameValuesTable != []) {
     for (let ord = 0; ord < 8; ord++) {
-      check_row = y + relative_coordinates_to_check[ord][1];
-      check_col = x + relative_coordinates_to_check[ord][2];
+      check_row = row + relative_coordinates_to_check[ord][1];
+      check_col = col + relative_coordinates_to_check[ord][2];
 
       if (
-        check_row >= 0 &&
-        check_col >= 0 &&
-        check_row < size &&
-        check_col < size &&
+        validCell(check_row, check_col) &&
         gameValuesTable[check_row][check_col] === "#"
       ) {
         count_of_mines_nearby += 1;
       }
     }
   }
-  return gameValuesTable[x][y] === "#" ? "#" : count_of_mines_nearby;
+  return gameValuesTable[row][col] === "#" ? "#" : count_of_mines_nearby;
 };
 
+// Runs the above "Count Mines function" for all cells in the values grid.
 const generateMineCounts = function () {
   for (let row = 0; row < size; row++) {
     for (let col = 0; col < size; col++) {
@@ -123,6 +131,33 @@ const generateMineCounts = function () {
   }
 };
 
+// The function that runs when a "cell" is clicked. <-- Fix This
+
+const pickSquare = function (item) {
+  let itemRow = item.id.split(",")[0];
+  let itemCol = item.id.split(",")[1];
+  visibilityTable[itemRow][itemCol] = 1;
+  console.log(`Row: ${itemRow} Col: ${itemCol}`);
+  if (gameValuesTable[itemRow][itemCol] == 0) {
+    for (let ord = 0; ord < 8; ord++) {
+      let check_row =
+        Number(itemRow) + Number(relative_coordinates_to_check[ord][1]);
+      let check_col =
+        Number(check_row) + Number(relative_coordinates_to_check[ord][2]);
+      console.log(`Getting ID Row ${check_row},${check_col}`);
+      if (
+        validCell(check_row, check_col) &&
+        visibilityTable[check_row][check_col] != 1
+      ) {
+        pickSquare(document.getElementById(`${check_row},${check_col}`));
+  } else {
+    visibilityTable[itemRow][itemCol] = 1;
+    item.innerText = gameValuesTable[itemRow][itemCol];
+    item.classList.add("white");
+      }
+    }
+  }
+};
 
 // Events
 startBtn.addEventListener("click", generateGameTable);
