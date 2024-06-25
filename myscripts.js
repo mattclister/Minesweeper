@@ -55,7 +55,7 @@ const generateGameTable = function () {
     gameValuesTable.push([]);
     visibilityTable.push([]);
     for (let col = 0; col < size; col++) {
-      outputRow += `<td><button onclick="pickSquare(this)" class="game-button"id="${col},${row}"></button></td>`;
+      outputRow += `<td><button onclick="pickSquare(this)" class="game-button"id="${row},${col}"></button></td>`;
       gameValuesTable[row].push([0]);
       visibilityTable[row].push(0);
     }
@@ -98,8 +98,8 @@ const calculateNumber = function (x, y) {
 
   if (gameValuesTable != []) {
     for (let ord = 0; ord < 8; ord++) {
-      check_row = x + relative_coordinates_to_check[ord][1];
-      check_col = y + relative_coordinates_to_check[ord][2];
+      check_row = y + relative_coordinates_to_check[ord][1];
+      check_col = x + relative_coordinates_to_check[ord][2];
 
       if (
         check_row >= 0 &&
@@ -123,45 +123,6 @@ const generateMineCounts = function () {
   }
 };
 
-// Infinately checking square in loop
-
-const revealsquare = function (x, y) {
-  if ( x >= 0 && y >= 0 && x < size && y < size && visibilityTable[x][y] == 0) {
-  const square = document.getElementById(`${x},${y}`);
-  if (square.hasAttribute("class: white")) {
-    square.classList.add("white");
-    console.log(square)
-    square.innerText = gameValuesTable[x][y]
-    if(gameValuesTable[x][y] == 0 ){
-      revealsquare(x-1,y-1)
-      revealsquare(x-1,y)
-      revealsquare(x-1,1)
-      revealsquare(x,y-1)
-      revealsquare(x,y+1)
-      revealsquare(x+1,y-1)
-      revealsquare(x+1,y)
-      revealsquare(x+1,y+1)
-    };
-  };
-  };
-};
-
-const pickSquare = function (item) {
-  let position = item.id.split(",");
-  console.log(`Position: ${position}`);
-  if (gameValuesTable[position[0]][position[1]] === "#") {
-    console.log("Mine FOUND");
-    alert("You Have LOST!");
-    gameSpace.innerHTML = [];
-    visibilityTable = [];
-  } else if (gameValuesTable[position[0]][position[1]] >= 1 && visibilityTable[position[0]][position[1]] == 0) {
-    item.innerText = gameValuesTable[position[0]][position[1]];
-    item.classList.add("white");
-    visibilityTable[position[0]][position[1]] = 1
-  } else if (gameValuesTable[position[0]][position[1]] == 0 && visibilityTable[position[0]][position[1]] == 0) {
-    revealsquare(position[0], position[1]);
-  }
-};
 
 // Events
 startBtn.addEventListener("click", generateGameTable);
