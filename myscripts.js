@@ -23,7 +23,9 @@ const relative_coordinates_to_check = [
 // Get start elements from layout
 
 let allGridButtons;
+let gameButtons = document.getElementsByClassName("game-button");
 let gameSpace = document.getElementById("game-space");
+let flagBtn = document.getElementById("plant-flag");
 let startBtn = document.getElementById("btn-start");
 let difficultySettings = document.getElementsByName("dificulty");
 let difficulty = [...difficultySettings].filter(
@@ -32,6 +34,7 @@ let difficulty = [...difficultySettings].filter(
 let size = difficultyGridSettings[difficulty]["gridSize"];
 let modifier = difficultyGridSettings[difficulty]["modifier"];
 let modifierTotal = 0;
+let flag = false;
 
 // ---------------------- FUNCTIONS ----------------------
 
@@ -136,14 +139,20 @@ const generateMineCounts = function () {
 const pickSquare = function (item) {
   let itemRow = item.id.split(",")[0];
   let itemCol = item.id.split(",")[1];
-  visibilityTable[itemRow][itemCol] = 1;
   console.log(`Row: ${itemRow} Col: ${itemCol}`);
-  if (gameValuesTable[itemRow][itemCol] == 0) {
+  if (flag && item.innerText != "F") {item.innerText = "F"
+  } else if (flag && item.innerText == "F") {item.innerText = ""}
+  else if (gameValuesTable[itemRow][itemCol] == "#") {
+    alert("MINE FOUND You have lost")
+    gameValuesTable = []
+    visibilityTable = []
+    gameSpace.innerHTML = []
+  } else if (gameValuesTable[itemRow][itemCol] == 0) {
     for (let ord = 0; ord < 8; ord++) {
       let check_row =
         Number(itemRow) + Number(relative_coordinates_to_check[ord][1]);
       let check_col =
-        Number(check_row) + Number(relative_coordinates_to_check[ord][2]);
+        Number(itemCol) + Number(relative_coordinates_to_check[ord][2]);
       console.log(`Getting ID Row ${check_row},${check_col}`);
       if (
         validCell(check_row, check_col) &&
@@ -155,9 +164,26 @@ const pickSquare = function (item) {
         item.innerText = gameValuesTable[itemRow][itemCol];
         item.classList.add("white");
       }
+      visibilityTable[itemRow][itemCol] = 1;
     }
+  } else {
+      visibilityTable[itemRow][itemCol] = 1;
+      item.innerText = gameValuesTable[itemRow][itemCol];
+        item.classList.add("white");
   }
+};
+
+// Plant Flag
+const plantFlag = function() {
+  if (flag) {flag = false;
+    flagBtn.innerText = "Flag"
+    flagBtn.classList.remove("blue")
+  } else {flag = true
+    flagBtn.innerText = "Select"
+    flagBtn.classList.add("blue")
+};
 };
 
 // Events
 startBtn.addEventListener("click", generateGameTable);
+flagBtn.addEventListener("click", plantFlag);

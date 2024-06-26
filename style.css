@@ -6,6 +6,10 @@
     background-color: white;
 }
 
+.blue {
+    background-color: blue;
+}
+
 #game-space button {
     height: 30px;
     width: 30px;
