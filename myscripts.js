@@ -150,10 +150,10 @@ const pickSquare = function (item) {
         visibilityTable[check_row][check_col] != 1
       ) {
         pickSquare(document.getElementById(`${check_row},${check_col}`));
-  } else {
-    visibilityTable[itemRow][itemCol] = 1;
-    item.innerText = gameValuesTable[itemRow][itemCol];
-    item.classList.add("white");
+      } else {
+        visibilityTable[itemRow][itemCol] = 1;
+        item.innerText = gameValuesTable[itemRow][itemCol];
+        item.classList.add("white");
       }
     }
   }
