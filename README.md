@@ -8,3 +8,5 @@ My aim is to better understand how frameworks and other JS tools, can be useful,
 ------ PROGRESS -------
 - So far I have a working version of minesweeper, using only JS, HTML and CSS. You can view it here: https://codepen.io/mattclister/pen/PovLxaW
 
+------ NOTES ------
+- 
